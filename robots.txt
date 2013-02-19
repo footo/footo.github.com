@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: http://footo.github.com/sitemap.xml 

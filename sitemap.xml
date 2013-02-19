@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
+    <url>
+        <loc>http://footo.github.com/blog/2012/12/01/something-about-treap/</loc>
+        <lastmod>2013-02-19T13:54:36+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://footo.github.com/blog/2012/12/01/spoj726-plus-tyvj1852/</loc>
+        <lastmod>2013-02-19T13:54:36+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://footo.github.com/archives/</loc>
+        <lastmod>2013-02-19T13:54:36+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://footo.github.com/robots.txt</loc>
+        <lastmod>2013-02-19T13:54:36+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://footo.github.com/blog/archives/</loc>
+        <lastmod>2013-02-19T13:54:36+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://footo.github.com/</loc>
+        <lastmod>2013-02-19T13:54:36+08:00</lastmod>
+    </url>
+</urlset>

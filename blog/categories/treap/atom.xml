@@ -4,7 +4,7 @@
   <title><![CDATA[Category: treap | Foo! To!]]></title>
   <link href="http://footo.github.com/blog/categories/treap/atom.xml" rel="self"/>
   <link href="http://footo.github.com/"/>
-  <updated>2013-07-08T20:24:44+08:00</updated>
+  <updated>2013-07-08T21:58:41+08:00</updated>
   <id>http://footo.github.com/</id>
   <author>
     <name><![CDATA[footo]]></name>
@@ -24,7 +24,7 @@
 
 <p>数组(mem[])模拟指针。需要的域有数值(data)、子节点(用了在zkw写的splay中的处理方法，用ch[2]来记录两个儿子的指针。会方便很多。)以及treap特有的标记(tag)。这里满足左子树数值小于自己数值；标记则是大根堆。</p>
 
-<p><code>
+<p><code>cpp
 struct tree {
   int tag, ch[2];
   ll data;
@@ -39,9 +39,9 @@ struct tree {
 <h3>对于操作中节点改动的处理</h3>
 
 <p>对于可能发生的节点改动，为了使父子关系对应正确，所有可能对结构改造的操作均返回改动后的节点指针。大概就是这样：
-<code>
+<code>cpp
 int operation(int T) {
-  do something;
+  do_something;
   return new_T;
 }
 </code></p>
@@ -49,7 +49,7 @@ int operation(int T) {
 <h3>旋转操作</h3>
 
 <p>传入一个布尔量d，表示将d子节点旋转至当前位置（与字面上的左旋、右旋相反），于是旋转只要一个。<em>(从zkw的splay那里学来的-v-)</em>
-<code>
+<code>cpp
 inline int rot(int T, bool d) {
   int x=mem[T].ch[d], y=mem[x].ch[!d];
   mem[T].ch[d]=y; mem[x].ch[!d]=T;
@@ -60,7 +60,7 @@ inline int rot(int T, bool d) {
 <h3>插入操作</h3>
 
 <p>插入操作采用的思想是先按传统BST的插入方法插入，然后对于每一层的节点与下一层节点比较，若不满足堆性质（子节点标记大于当前标记）则将子节点旋转上来。
-<code>
+<code>cpp
 int ins(int T, ll d0) {
   bool d;
   if (!T) { mem[cnt].data=d0; return size++; }
@@ -78,7 +78,7 @@ int ins(int T, ll d0) {
 <p>操作采用贪心逼近思想。</p>
 
 <blockquote><p>   在树中查找，一旦遇到一个不大于这个元素的值的节点，更新当前的最优的节点，然后在当前节点的右子树中继续查找，目的是希望能找到一个更接近于这个元素的节点。如果遇到大于这个元素的值的节点，不更新最优值，节点的左子树中继续查找。直到遇到空节点，查找结束，当前最优的节点的值就是要求的前驱。求后继的方法与上述相似，只是要找不小于这个元素的值的节点。
-```
+```cpp
 int fin(int T, ll d0, int best, bool d) {
   if (!T) return best;</p>
 
@@ -95,7 +95,7 @@ int fin(int T, ll d0, int best, bool d) {
 <p>几个基本操作中最烦的。传入待删除数值todel，从根开始查找这一节点并开始删除。虽然也可以直接传入待删除指针并从该指针开始删除，但这就需要记录父亲指针，在维护节点时无疑会困难很多。因此在时间要求不特别严格是还是用这种方法较好。</p></blockquote>
 
 <p>利用标记的堆性质，将待删除节点不断与标记较大的子节点交换（旋转），直至成为叶子节点后返回0即可。
-```
+```cpp
 int del(int T, ll todel) {
   int ret=T; bool d;
   if (todel==mem[T].data) {</p>

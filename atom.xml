@@ -4,7 +4,7 @@
   <title><![CDATA[Foo! To!]]></title>
   <link href="http://footo.github.com/atom.xml" rel="self"/>
   <link href="http://footo.github.com/"/>
-  <updated>2013-07-08T20:24:44+08:00</updated>
+  <updated>2013-07-08T21:58:41+08:00</updated>
   <id>http://footo.github.com/</id>
   <author>
     <name><![CDATA[footo]]></name>
@@ -14,17 +14,64 @@
 
   
   <entry>
-    <title type="html"><![CDATA[test]]></title>
-    <link href="http://footo.github.com/blog/2013/07/08/test/"/>
-    <updated>2013-07-08T20:19:00+08:00</updated>
-    <id>http://footo.github.com/blog/2013/07/08/test</id>
-    <content type="html"><![CDATA[<p>I am <em>confused</em>.</p>
+    <title type="html"><![CDATA[一些关于BIT扩展的整理]]></title>
+    <link href="http://footo.github.com/blog/2013/07/08/extension-about-bit/"/>
+    <updated>2013-07-08T21:53:00+08:00</updated>
+    <id>http://footo.github.com/blog/2013/07/08/extension-about-bit</id>
+    <content type="html"><![CDATA[<p>树状数组（BIT）以其代码简洁、效率高见长，但又由于它的应用弹性远不如线段树而与其在竞赛中相互制衡。
+然而，对于我等手残党而言，为了尽可能避免使用线段树这种又长又难调的东西，学会增强BIT是十分必要的！</p>
 
-<figure class='code'><figcaption><span>Time to be Awesome - awesome.rb </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="nb">puts</span> <span class="s2">&quot;Awesome!&quot;</span> <span class="k">unless</span> <span class="n">lame</span>
+<h3>基本模型-改点球段</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="n">d</span><span class="p">,</span> <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(;</span> <span class="n">x</span><span class="o">&lt;=</span><span class="n">n</span><span class="p">;</span> <span class="n">d</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">+=</span><span class="n">val</span><span class="p">,</span> <span class="n">x</span><span class="o">+=</span><span class="n">lowbit</span><span class="p">(</span><span class="n">x</span><span class="p">));</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="n">query</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="n">d</span><span class="p">,</span> <span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(;</span> <span class="n">x</span><span class="o">&lt;=</span><span class="n">n</span><span class="p">;</span> <span class="n">ret</span><span class="o">+=</span><span class="n">d</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">x</span><span class="o">-=</span><span class="n">lowbit</span><span class="p">(</span><span class="n">x</span><span class="p">));</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
+
+<p>树状数组的概念啊原理啊什么的都不是本文讨论的对象，因此仅献上代码，后文的几种扩展都在此基础之上。</p>
+
+<!--more-->
+
+
+<h3>第一次修改-改段求点</h3>
+
+<p>首先分析一下BIT的作用。
+不加BIT的情况下，对一个数组进行点修改的复杂度为<code>O(1)</code>，段询问复杂度为<code>O(n)</code>；而加入BIT之后，两个操作的复杂度都变为了<code>O(log n)</code>。
+也就是说，他能将在<code>O(log n)</code>的时间内完成<strong>点修改</strong>和<strong>段询问</strong>。而我们的目标是在同样的时间内完成<strong>段修改</strong>和<strong>点询问</strong>。</p>
+
+<pre><code>origin:  1  7  7  6  0  4  3
+assist:  1  6  0 -1 -6  4 -1
+</code></pre>
+
+<p>设计一个新的数组<code>assist[]</code>，使得<code>assist[i]=origin[i]-origin[i-1]</code>。也就是说，<code>assist[]</code>储存的是原数组的增量。既然如此，那么将原数组<code>[l,r]</code>加上<code>val</code>的操作便可以转化为两个对<code>assist</code>数组的点操作:</p>
+
+<pre><code>assist[l] += val;
+assist[r+1] -= val;
+</code></pre>
+
+<p>因为在<code>assist</code>的某一位+1等于原数组中从这一位开始往后每一位都加了一。于是我们便成功的把对元数组的段修改转化为了对辅助数组的点修改。
+在观察这两个数组，不难发现，<code>sum(assist[1..i])</code>的值即为<code>origin[i]</code>。因此，对原数组的点询问便可以转化为对辅助数组的段询问。</p>
+
+<p>于是就明朗了。我们只需要将树状数组建立在<code>assist</code>数组之上即可实现该段求点。
+（当初学这个的时候被误导的很深啊草）</p>
+
+<p>（未完待续）</p>
 ]]></content>
   </entry>
   
@@ -65,16 +112,17 @@
 
 <p>数组(mem[])模拟指针。需要的域有数值(data)、子节点(用了在zkw写的splay中的处理方法，用ch[2]来记录两个儿子的指针。会方便很多。)以及treap特有的标记(tag)。这里满足左子树数值小于自己数值；标记则是大根堆。</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>struct tree {
-</span><span class='line'>  int tag, ch[2];
-</span><span class='line'>  ll data;
-</span><span class='line'>  tree(): data(-oo), tag((rand()&lt;&lt;15)+rand()) { ch[0]=ch[1]=0; }
-</span><span class='line'>} mem[N];</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">tree</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">tag</span><span class="p">,</span> <span class="n">ch</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+</span><span class='line'>  <span class="n">ll</span> <span class="n">data</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">tree</span><span class="p">()</span><span class="o">:</span> <span class="n">data</span><span class="p">(</span><span class="o">-</span><span class="n">oo</span><span class="p">),</span> <span class="n">tag</span><span class="p">((</span><span class="n">rand</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="mi">15</span><span class="p">)</span><span class="o">+</span><span class="n">rand</span><span class="p">())</span> <span class="p">{</span> <span class="n">ch</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">ch</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">}</span> <span class="n">mem</span><span class="p">[</span><span class="n">N</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p><em>注：oo=∞。<code>(rand()&lt;&lt;15)+rand()</code>是一种不错的解决随机范围的方式哦=w=</em></p>
@@ -86,50 +134,53 @@
 
 <p>对于可能发生的节点改动，为了使父子关系对应正确，所有可能对结构改造的操作均返回改动后的节点指针。大概就是这样：</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>int operation(int T) {
-</span><span class='line'>  do something;
-</span><span class='line'>  return new_T;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="kt">int</span> <span class="n">operation</span><span class="p">(</span><span class="kt">int</span> <span class="n">T</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">do_something</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">new_T</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <h3>旋转操作</h3>
 
 <p>传入一个布尔量d，表示将d子节点旋转至当前位置（与字面上的左旋、右旋相反），于是旋转只要一个。<em>(从zkw的splay那里学来的-v-)</em></p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>inline int rot(int T, bool d) {
-</span><span class='line'>  int x=mem[T].ch[d], y=mem[x].ch[!d]; 
-</span><span class='line'>  mem[T].ch[d]=y; mem[x].ch[!d]=T;
-</span><span class='line'>  return x;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="kr">inline</span> <span class="kt">int</span> <span class="n">rot</span><span class="p">(</span><span class="kt">int</span> <span class="n">T</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">d</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">x</span><span class="o">=</span><span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">ch</span><span class="p">[</span><span class="n">d</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">mem</span><span class="p">[</span><span class="n">x</span><span class="p">].</span><span class="n">ch</span><span class="p">[</span><span class="o">!</span><span class="n">d</span><span class="p">];</span>
+</span><span class='line'>  <span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">ch</span><span class="p">[</span><span class="n">d</span><span class="p">]</span><span class="o">=</span><span class="n">y</span><span class="p">;</span> <span class="n">mem</span><span class="p">[</span><span class="n">x</span><span class="p">].</span><span class="n">ch</span><span class="p">[</span><span class="o">!</span><span class="n">d</span><span class="p">]</span><span class="o">=</span><span class="n">T</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">x</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <h3>插入操作</h3>
 
 <p>插入操作采用的思想是先按传统BST的插入方法插入，然后对于每一层的节点与下一层节点比较，若不满足堆性质（子节点标记大于当前标记）则将子节点旋转上来。</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>int ins(int T, ll d0) {
-</span><span class='line'>  bool d;
-</span><span class='line'>  if (!T) { mem[cnt].data=d0; return size++; }
-</span><span class='line'>  mem[T].ch[d=(d0&gt;=mem[T].data)]=ins(mem[T].ch[d], d0);
-</span><span class='line'>  if (mem[mem[T].ch[d]].tag&gt;mem[T].tag) T=rot(T, d);
-</span><span class='line'>  return T;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="kt">int</span> <span class="n">ins</span><span class="p">(</span><span class="kt">int</span> <span class="n">T</span><span class="p">,</span> <span class="n">ll</span> <span class="n">d0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">bool</span> <span class="n">d</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">T</span><span class="p">)</span> <span class="p">{</span> <span class="n">mem</span><span class="p">[</span><span class="n">cnt</span><span class="p">].</span><span class="n">data</span><span class="o">=</span><span class="n">d0</span><span class="p">;</span> <span class="k">return</span> <span class="n">size</span><span class="o">++</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>  <span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">ch</span><span class="p">[</span><span class="n">d</span><span class="o">=</span><span class="p">(</span><span class="n">d0</span><span class="o">&gt;=</span><span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">data</span><span class="p">)]</span><span class="o">=</span><span class="n">ins</span><span class="p">(</span><span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">ch</span><span class="p">[</span><span class="n">d</span><span class="p">],</span> <span class="n">d0</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="n">mem</span><span class="p">[</span><span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">ch</span><span class="p">[</span><span class="n">d</span><span class="p">]].</span><span class="n">tag</span><span class="o">&gt;</span><span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">tag</span><span class="p">)</span> <span class="n">T</span><span class="o">=</span><span class="n">rot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">d</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">T</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p><em>注：cnt表示当前使用的数组内存数。</em></p>
@@ -142,18 +193,19 @@
 
 <blockquote><p>   在树中查找，一旦遇到一个不大于这个元素的值的节点，更新当前的最优的节点，然后在当前节点的右子树中继续查找，目的是希望能找到一个更接近于这个元素的节点。如果遇到大于这个元素的值的节点，不更新最优值，节点的左子树中继续查找。直到遇到空节点，查找结束，当前最优的节点的值就是要求的前驱。求后继的方法与上述相似，只是要找不小于这个元素的值的节点。</p></blockquote>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>int fin(int T, ll d0, int best, bool d) {
-</span><span class='line'>  if (!T) return best;
-</span><span class='line'>        if (mem[T].data==d0) return T;
-</span><span class='line'>  if (d^(mem[T].data&gt;d0)) best=T;
-</span><span class='line'>  return fin(mem[T].ch[!(d^(best==T))],d0,best,d);
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="kt">int</span> <span class="n">fin</span><span class="p">(</span><span class="kt">int</span> <span class="n">T</span><span class="p">,</span> <span class="n">ll</span> <span class="n">d0</span><span class="p">,</span> <span class="kt">int</span> <span class="n">best</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">d</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">T</span><span class="p">)</span> <span class="k">return</span> <span class="n">best</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">data</span><span class="o">==</span><span class="n">d0</span><span class="p">)</span> <span class="k">return</span> <span class="n">T</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="n">d</span><span class="o">^</span><span class="p">(</span><span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">data</span><span class="o">&gt;</span><span class="n">d0</span><span class="p">))</span> <span class="n">best</span><span class="o">=</span><span class="n">T</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">fin</span><span class="p">(</span><span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">ch</span><span class="p">[</span><span class="o">!</span><span class="p">(</span><span class="n">d</span><span class="o">^</span><span class="p">(</span><span class="n">best</span><span class="o">==</span><span class="n">T</span><span class="p">))],</span><span class="n">d0</span><span class="p">,</span><span class="n">best</span><span class="p">,</span><span class="n">d</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <h3>删除操作</h3>
@@ -162,7 +214,7 @@
 
 <p>利用标记的堆性质，将待删除节点不断与标记较大的子节点交换（旋转），直至成为叶子节点后返回0即可。</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -172,16 +224,17 @@
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>int del(int T, ll todel) {
-</span><span class='line'>  int ret=T; bool d;
-</span><span class='line'>  if (todel==mem[T].data) {
-</span><span class='line'>    if (!(mem[T].ch[0]||mem[T].ch[1])) return 0;
-</span><span class='line'>    ret=rot(T, d=(mem[mem[T].ch[0]].tag&lt;mem[mem[T].ch[1]].tag));
-</span><span class='line'>    mem[ret].ch[!d]=del(T,todel);
-</span><span class='line'>  }
-</span><span class='line'>  else mem[T].ch[d=todel&gt;mem[T].data]=del(mem[T].ch[d],todel);
-</span><span class='line'>  return ret;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="kt">int</span> <span class="n">del</span><span class="p">(</span><span class="kt">int</span> <span class="n">T</span><span class="p">,</span> <span class="n">ll</span> <span class="n">todel</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">ret</span><span class="o">=</span><span class="n">T</span><span class="p">;</span> <span class="kt">bool</span> <span class="n">d</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="n">todel</span><span class="o">==</span><span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">ch</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">||</span><span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">ch</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ret</span><span class="o">=</span><span class="n">rot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="p">(</span><span class="n">mem</span><span class="p">[</span><span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">ch</span><span class="p">[</span><span class="mi">0</span><span class="p">]].</span><span class="n">tag</span><span class="o">&lt;</span><span class="n">mem</span><span class="p">[</span><span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">ch</span><span class="p">[</span><span class="mi">1</span><span class="p">]].</span><span class="n">tag</span><span class="p">));</span>
+</span><span class='line'>    <span class="n">mem</span><span class="p">[</span><span class="n">ret</span><span class="p">].</span><span class="n">ch</span><span class="p">[</span><span class="o">!</span><span class="n">d</span><span class="p">]</span><span class="o">=</span><span class="n">del</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">todel</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">else</span> <span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">ch</span><span class="p">[</span><span class="n">d</span><span class="o">=</span><span class="n">todel</span><span class="o">&gt;</span><span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">data</span><span class="p">]</span><span class="o">=</span><span class="n">del</span><span class="p">(</span><span class="n">mem</span><span class="p">[</span><span class="n">T</span><span class="p">].</span><span class="n">ch</span><span class="p">[</span><span class="n">d</span><span class="p">],</span><span class="n">todel</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>有些部分略难懂，可以简单画一画再看</p>

@@ -1,0 +1,12 @@
+---
+layout: post
+title: "test"
+date: 2013-07-08 20:19
+comments: true
+categories:
+---
+
+I am _confused_.
+{% codeblock Time to be Awesome - awesome.rb %}
+puts "Awesome!" unless lame
+{% endcodeblock %}

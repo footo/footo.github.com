@@ -4,7 +4,7 @@
   <title><![CDATA[Foo! To!]]></title>
   <link href="http://footo.github.com/atom.xml" rel="self"/>
   <link href="http://footo.github.com/"/>
-  <updated>2013-02-21T21:16:07+08:00</updated>
+  <updated>2013-07-08T20:24:44+08:00</updated>
   <id>http://footo.github.com/</id>
   <author>
     <name><![CDATA[footo]]></name>
@@ -12,6 +12,21 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[test]]></title>
+    <link href="http://footo.github.com/blog/2013/07/08/test/"/>
+    <updated>2013-07-08T20:19:00+08:00</updated>
+    <id>http://footo.github.com/blog/2013/07/08/test</id>
+    <content type="html"><![CDATA[<p>I am <em>confused</em>.</p>
+
+<figure class='code'><figcaption><span>Time to be Awesome - awesome.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="nb">puts</span> <span class="s2">&quot;Awesome!&quot;</span> <span class="k">unless</span> <span class="n">lame</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[[spoj 726 promotion [tyvj P1852 - [HNOI2004]宠物收养所 两道treap的裸题练习]]></title>

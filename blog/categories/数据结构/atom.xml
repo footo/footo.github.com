@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Foo! To!]]></title>
   <link href="http://footo.github.com/blog/categories/数据结构/atom.xml" rel="self"/>
   <link href="http://footo.github.com/"/>
-  <updated>2013-07-20T15:36:41+08:00</updated>
+  <updated>2013-07-20T17:12:02+08:00</updated>
   <id>http://footo.github.com/</id>
   <author>
     <name><![CDATA[footo]]></name>
@@ -55,17 +55,84 @@ return ret;
 assist:  1  6  0 -1 -6  4 -1
 </code></pre>
 
-<p>设计一个新的数组<code>assist[]</code>，使得<code>assist[i]=origin[i]-origin[i-1]</code>。也就是说，<code>assist[]</code>储存的是原数组的增量。既然如此，那么将原数组<code>[l,r]</code>加上<code>val</code>的操作便可以转化为两个对<code>assist</code>数组的点操作:</p>
+<p>设计一个新的数组<code>assist[]</code>，使得assist[i]=origin[i]-origin[i-1]。也就是说，<code>assist[]</code>储存的是原数组的增量。将前面的等式变形后可以得到origin[i]=assist[i]+origin[i-1]，以此类推，可以得到origin[i]=assist[i]+assist[i-1]+...+assist<a href="http://thumbsnap.com/i/PiShTZwn.png">1</a>。由此发现，assist数组的改动在原数组中会波及此元素后面所有的元素。利用这一性质便可以方便的将段修改转化为<strong>点修改</strong>。</p>
 
 <pre><code>assist[l] += val;
 assist[r+1] -= val;
 </code></pre>
 
-<p>因为在<code>assist</code>的某一位+1等于原数组中从这一位开始往后每一位都加了一。于是我们便成功的把对元数组的段修改转化为了对辅助数组的点修改。
-在观察这两个数组，不难发现，<code>sum(assist[1..i])</code>的值即为<code>origin[i]</code>。因此，对原数组的点询问便可以转化为对辅助数组的段询问。</p>
+<p>而原来的点询问也变成了段询问。于是就明朗了。我们只需要将树状数组建立在<code>assist[]</code>之上即可实现该段求点。</p>
 
-<p>于是就明朗了。我们只需要将树状数组建立在<code>assist</code>数组之上即可实现该段求点。
-（当初学这个的时候被误导的很深啊草）</p>
+<p>（当初学这个的时候被误导的很深啊草）</p>
+
+<h3>出乎意料的简单-该段求段</h3>
+
+<p>很多学了BIT的人大多只学到该段求点便撒手不往下学，往往忽略了改段求段这一简单而有意想不到的实用的扩展。</p>
+
+<p>先从改段求点开始考虑。</p>
+
+<pre><code>origin:  1  7  7  6  0  4  3
+assist:  1  6  0 -1 -6  4 -1
+</code></pre>
+
+<p>如果要求原数组中前5个数的和的话，我们先要求出assist[]中前五个数的和构成origin[5]，然后是前四个数的和构成origin[4]，前三个数的和构成origin[3]...再把这些全都加出来即可。</p>
+
+<p><img src="http://thumbsnap.com/i/PiShTZwn.png" alt="演示" /></p>
+
+<p>这样做的时间复杂度是<code>O(nlogn)</code>的，显然不是我们所预期的。注意到上图的那些橙色的线条，如果我们在他们右边补上一些线条，形成一个方块的话....</p>
+
+<p><img src="http://thumbsnap.com/i/PTWot0ij.png" alt="演示" /></p>
+
+<p>只消将第一个橙条乘上6，再减去蓝条便能得到我们想要的结果。那么如何在<code>O(logn)</code>的时间内求出蓝条呢？观察图片不难发现，assist[5]在蓝条中出现了5次，assist[4]出现了4次，assist[3]出现了3次...于是我们只需要在开一个数组<code>assist2[]</code>使得assist2[i]=assist[i]*i即可。</p>
+
+<pre><code>origin:  1  7  7  6  0  4  3
+assist:  1  6  0 -1 -6  4  -1
+assist2: 1 12  0 -4 -30 24 -7
+
+sum(origin,n) = sum(assist,n)*(n+1) - sum(assist2,n)
+</code></pre>
+
+<p>附上代码。</p>
+
+<p>```cpp
+void update(int *d, int p, int delta) {</p>
+
+<pre><code>for (; p&lt;=n; d[p]+=delta, p+=lowbit(p)) ;
+</code></pre>
+
+<p>}</p>
+
+<p>int query(int *d, int p) {</p>
+
+<pre><code>int ret;
+for (ret=0; p; ret+=d[p], p-=lowbit(p)) ;
+return ret;
+</code></pre>
+
+<p>}</p>
+
+<p>void add(int a, int b, int c) {</p>
+
+<pre><code>update(d, a, c);
+update(d, b+1, -c);
+update(d_help, a, c*a);
+update(d_help, b+1, -c*(b+1));
+</code></pre>
+
+<p>}</p>
+
+<p>int sum(int a) {</p>
+
+<pre><code>if (!a) return 0;
+return (a+1)*query(d, a) - query(d_help, a);
+</code></pre>
+
+<p>}
+```</p>
+
+<p><strong>练习题：</strong> <a href="http://poj.org/problem?id=3468">POJ 3468</a>：A Simple Problem with Integers</p>
+
+<p><a href="http://codepad.org/4TGVtHcp">view code</a></p>
 
 <p>（未完待续）</p>
 ]]></content>
